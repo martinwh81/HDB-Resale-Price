@@ -97,7 +97,7 @@ with st.expander("Expand to see details"):
     fig = plt.figure(figsize=(10,10))
     feat_imp = pd.DataFrame({'Features': feature_names, 'Feature Importance': model_rf.feature_importances_}).sort_values('Feature Importance', ascending=False)
     sns.barplot(y='Features', x='Feature Importance', data=feat_imp)
-    plt.title('OOB Feature Importance', size=15)
+    plt.title('Feature Importance', size=15)
     st.pyplot(fig)
 
 
