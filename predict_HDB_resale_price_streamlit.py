@@ -56,15 +56,10 @@ model_rf = load_model()
 
 
 
-st.subheader('How to Use:')
-st.markdown("""
-            - Expand the *left sidebar* (top left corner),
-            - Enter a HDB address / postal code and select the rest of HDB attributes
-            - Click ***Submit to Predict*** button to predict
-            """)
 
 
-st.subheader('Information:')
+
+st.subheader('Application Information')
 with st.expander("Expand to see details"):
     st.markdown("""
                 This is a web app to demonstrate machine learning capability to predict current price of HDB Resale Price. 
@@ -74,7 +69,7 @@ with st.expander("Expand to see details"):
                 the model.
 
                 The following graph shows the most important features at predicting HDB resale price:            
-                """)
+                """)                
 
     # Plotting the Feature Importance
     feature = model_rf.feature_names_in_
@@ -100,9 +95,48 @@ with st.expander("Expand to see details"):
     plt.title('Feature Importance', size=15)
     st.pyplot(fig)
 
+st.subheader('How to Use')
+st.markdown("""
+            - Expand the *left sidebar* (top left corner),
+            - Enter a HDB address / postal code and select the rest of HDB attributes
+            - Click ***Submit to Predict*** button to predict
+            """)
 
+st.subheader('What is Machine Learning?')
+with st.expander("Expand to see explanations"):
+    st.markdown("""
+                Machine learning is a branch of artificial intelligence (AI) that to enable computers to automatically *recognize patterns*, *make predictions*,
+                or *make decisions* based on the information they gather and the experiences they accumulate. 
+                It's all about teaching computers to learn and improve tasks by themselves through data-driven insights.
 
+                There are **three main types** of machine learning: ***supervised learning***, ***unsupervised learning***, and ***reinforcement learning***, each with its own characteristics, advantages, and disadvantages.
 
+                1. **Supervised Learning**:
+                    - Definition: In supervised learning, the algorithm is trained on a labeled dataset, where each input example has a corresponding correct output. The goal is for the algorithm to learn a mapping from inputs to outputs.
+                    - Pros:
+                      1. Well-suited for tasks like classification and regression.
+                      1. Can provide accurate predictions when provided with sufficient labeled data.
+                    - Cons:
+                      1. Requires a large amount of labeled data, which can be costly to obtain.
+                      1. May perform poorly if the training data is biased or not representative of the real-world distribution.
+                2. **Unsupervised Learning**:
+                    - Definition: Unsupervised learning deals with unlabeled data. The algorithm tries to find patterns, structures, or groupings in the data without any predefined outputs.
+                    - Pros:
+                      1. Useful for discovering hidden patterns or relationships in data.
+                      1. Doesn't require labeled data, making it more versatile.
+                    - Cons:
+                      1. Results can be subjective and may require interpretation.
+                      1. Evaluation can be challenging because there are no clear correct answers.
+                3. **Reinforcement Learning**:
+                    - Definition: Reinforcement learning involves an agent learning to make decisions by interacting with an environment. The agent receives rewards or penalties based on its actions and learns to maximize its cumulative reward over time.
+                    - Pros:
+                      1. Suitable for tasks with sequential decision-making, like robotics and game playing.
+                      1. Can adapt to changing environments.
+                    - Cons:
+                      1. Can be computationally intensive and require a lot of training.
+                      1. Learning can be slow, and initial exploration may lead to suboptimal results.    
+                """)     
+         
 
 
 # Get flat coordinate:
@@ -248,6 +282,7 @@ with st.expander("Supermarket/Shop"):
       
 st.markdown("#")
 
-st.header(f'The Predicted HDB Resale Price is SG${flat1_predict[0]:,.0f}')
-
+# st.header(f'The Predicted HDB Resale Price is SG${flat1_predict[0]:,.0f}')
+textresult = f'<p style="font-family:Arial;color:Blue; font-size: 28px;">The Predicted HDB Resale Price is <strong>SG${flat1_predict[0]:,.0f}</strong></p>'
+st.markdown(textresult,unsafe_allow_html=True)
 
