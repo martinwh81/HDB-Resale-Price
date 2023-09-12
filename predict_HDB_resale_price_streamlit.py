@@ -22,17 +22,17 @@ st.text(" ")
 with st.sidebar.form('User Input HDB Features'):
     flat_address = st.text_input("Flat Address or Postal Code", '110 BISHAN ST 12') # flat address
     
-    town = st.selectbox('Town', list(['ANG MO KIO', 'BEDOK', 'BISHAN', 'BUKIT BATOK', 'BUKIT MERAH',
+    town = st.selectbox('Town', sorted(list(['ANG MO KIO', 'BEDOK', 'BISHAN', 'BUKIT BATOK', 'BUKIT MERAH',
                                             'BUKIT TIMAH', 'CENTRAL AREA', 'CHOA CHU KANG', 'CLEMENTI',
                                             'GEYLANG', 'HOUGANG', 'JURONG EAST', 'JURONG WEST',
                                             'KALLANG/WHAMPOA', 'MARINE PARADE', 'QUEENSTOWN', 'SENGKANG',
                                             'SERANGOON', 'TAMPINES', 'TOA PAYOH', 'WOODLANDS', 'YISHUN',
-                                            'LIM CHU KANG', 'SEMBAWANG', 'BUKIT PANJANG', 'PASIR RIS','PUNGGOL']),
+                                            'LIM CHU KANG', 'SEMBAWANG', 'BUKIT PANJANG', 'PASIR RIS','PUNGGOL'])),
                                 index=2)
-    flat_model = st.selectbox('Flat Model', list(['Model A', 'Improved', 'Premium Apartment', 'Standard',
+    flat_model = st.selectbox('Flat Model', sorted(list(['Model A', 'Improved', 'Premium Apartment', 'Standard',
                                                   'New Generation', 'Maisonette', 'Apartment', 'Simplified',
                                                   'Model A2', 'DBSS', 'Terrace', 'Adjoined flat', 'Multi Generation',
-                                                  '2-room', 'Executive Maisonette', 'Type S1S2']), index=0)
+                                                  '2-room', 'Executive Maisonette', 'Type S1S2'])), index=7)
     flat_type = st.selectbox('Flat Type', list(['2 ROOM', '3 ROOM', '4 ROOM', '5 ROOM', 'EXECUTIVE']),
                                     index=0)
     floor_area = st.slider("Floor Area (sqm)", 34,280,104) # floor area
@@ -40,7 +40,8 @@ with st.sidebar.form('User Input HDB Features'):
     #                                             '16 TO 18','19 TO 21','22 TO 24','25 TO 27','28 TO 30',
     #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
     #                                             '46 TO 48','49 TO 51']), index=3)
-    storey = st.slider('Storey', 1,51,7)
+    # storey = st.slider('Storey', 1,51,7)
+    storey = st.selectbox('Storey', list(range(1, 52)),6)
     
     lease_commence_date = st.selectbox('Lease Commencement Date', list(reversed(range(1966, 2022))), index=35)
     
@@ -54,12 +55,119 @@ def load_model():
 
 model_rf = load_model()
 
+#################################################################################################################################################
+
+
+@st.cache(allow_output_mutation=True)
+def load_data(filepath):
+    return pd.read_csv(filepath)
+
+supermarket_coord = load_data('Data/supermarket_coordinates_clean.csv')
+school_coord = load_data('Data/school_coordinates_clean.csv')
+# hawker_coord = load_data('Data/hawker_coordinates_clean.csv')
+# shop_coord = load_data('Data/shoppingmall_coordinates_clean.csv')
+# park_coord = load_data('Data/parks_coordinates_clean.csv')
+mrt_coord = load_data('Data/MRT_coordinates.csv')[['STN_NAME','Latitude','Longitude']]
+cpi = pd.read_csv('Data/CPI.csv')
+prices =load_data('Data/Data_2017_onwards.csv')
+prices['month'] = pd.to_datetime(prices['month']) # to datetime
+replace_values = {'NEW GENERATION':'New Generation', 'SIMPLIFIED':'Simplified', 'STANDARD':'Standard', 'MODEL A-MAISONETTE':'Maisonette', 'MULTI GENERATION':'Multi Generation', 'IMPROVED-MAISONETTE':'Executive Maisonette', 'Improved-Maisonette':'Executive Maisonette', 'Premium Maisonette':'Executive Maisonette', '2-ROOM':'2-room', 'MODEL A':'Model A', 'MAISONETTE':'Maisonette', 'Model A-Maisonette':'Maisonette', 'IMPROVED':'Improved', 'TERRACE':'Terrace', 'PREMIUM APARTMENT':'Premium Apartment', 'Premium Apartment Loft':'Premium Apartment', 'APARTMENT':'Apartment', 'Type S1':'Type S1S2', 'Type S2':'Type S1S2'}
+prices = prices.replace({'flat_model': replace_values})
+
+#################################################################################################################################################
+# Function for lollipop charts
+def loll_plot(df, x, y, subtitle, xlabel, xlim):
+    plt.rc('axes', axisbelow=True)
+    plt.grid(linestyle='--', alpha=0.4)
+    plt.hlines(y=df.index, xmin=0, xmax=df[x], color=df.color, linewidth=1)
+    plt.scatter(df[x], df.index, color=df.color, s=500)
+    for i, txt in enumerate(df[x]):
+        plt.annotate(str(round(txt)), (txt, i), color='white', fontsize=9, ha='center', va='center')
+    plt.annotate(subtitle, xy=(1, 0), xycoords='axes fraction', fontsize=20,
+                    xytext=(-5, 5), textcoords='offset points',
+                    ha='right', va='bottom')
+    plt.yticks(df.index, df[y]); plt.xticks(fontsize=12); plt.xlim(xlim)
+    plt.xlabel(xlabel, fontsize=14)
 
 
 
+st.subheader('HDB Fact Charts')
+with st.expander("Expand to see charts"):
+    st.markdown("""                
+                 """)
+    price_game = prices.loc[prices['month'].dt.year>=2017].copy()
+    price_game = price_game[['month','town','flat_model','flat_type','floor_area_sqm','storey_range','lease_commence_date','resale_price']]
+    price_game.head()
+
+    # Chart by Town:
+    price_median_town = price_game.groupby('town')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_town['resale_price'] = price_median_town['resale_price'] /1000
+    price_median_town['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_town)-2) + ['#00ba38']    
+    fig, ax = plt.subplots(figsize=(10,10))
+    loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    ax.set_title('Median Resale Price by Town (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
+
+    # Chart by Flat Model:
+    price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_flat_model['resale_price'] = price_median_flat_model['resale_price'] /1000
+    price_median_flat_model['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_model)-2) + ['#00ba38']
+    fig, ax = plt.subplots(figsize=(10,10))
+    loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    ax.set_title('Median Resale Price by Flat Model (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
+
+    # Chart by Flat Type:
+    price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_flat_type['resale_price'] = price_median_flat_type['resale_price'] /1000
+    price_median_flat_type['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_type)-2) + ['#00ba38']
+    fig, ax = plt.subplots(figsize=(10,7))
+    loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    ax.set_title('Median Resale Price by Flat Type (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
+
+    # Chart by Floor Area:
+    bins = range(20,270,20)
+    price_game['floor_area_range'] = pd.cut(x=price_game['floor_area_sqm'],bins = bins)
+    price_median_floor_area = price_game.groupby('floor_area_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_floor_area['resale_price'] = price_median_floor_area['resale_price']/1000
+    price_median_floor_area['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_floor_area)-2) + ['#00ba38']
+    fig, ax = plt.subplots(figsize=(10,8))
+    loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    ax.set_title('Median Resale Price by Floor Area (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
+
+    # Chart by Storey:
+    price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_storey_range['resale_price'] = price_median_storey_range['resale_price'] /1000
+    price_median_storey_range['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_storey_range)-2) + ['#00ba38']
+    fig, ax = plt.subplots(figsize=(10,10))
+    loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    ax.set_title('Median Resale Price by Storey Range (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
+
+    # Chart by Lease Commence Date:
+    bins = range(1962,2024,4)
+    price_game['lease_date_range'] = pd.cut(x=price_game['lease_commence_date'],bins = bins)
+    price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_lease_commence_date['resale_price'] = price_median_lease_commence_date['resale_price']/1000
+    price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
+    fig, ax = plt.subplots(figsize=(10,10))
+    loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700])
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
+    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    ax.set_title('Median Resale Price by Lease Commence Date (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    st.pyplot(fig)
 
 
-st.subheader('Application Information')
+st.subheader('App Information')
 with st.expander("Expand to see details"):
     st.markdown("""
                 This is a web app to demonstrate machine learning capability to predict current price of HDB Resale Price. 
@@ -95,12 +203,16 @@ with st.expander("Expand to see details"):
     plt.title('Feature Importance', size=15)
     st.pyplot(fig)
 
-st.subheader('How to Use')
+#################################################################################################################################################
+
+st.subheader('How to Use to Predict HDB Resale Price')
 st.markdown("""
             - Expand the *left sidebar* (top left corner),
             - Enter a HDB address / postal code and select the rest of HDB attributes
             - Click ***Submit to Predict*** button to predict
             """)
+
+#################################################################################################################################################
 
 st.subheader('What is Machine Learning?')
 with st.expander("Expand to see explanations"):
@@ -138,6 +250,7 @@ with st.expander("Expand to see explanations"):
                 """)     
          
 
+#################################################################################################################################################
 
 # Get flat coordinate:
 coord = find_postal(flat_address)
@@ -148,18 +261,6 @@ try:
 except IndexError:
     st.error('Oops! Address is not valid! Please enter a valid address!')
     pass
-
-@st.cache(allow_output_mutation=True)
-def load_data(filepath):
-    return pd.read_csv(filepath)
-
-supermarket_coord = load_data('Data/supermarket_coordinates_clean.csv')
-school_coord = load_data('Data/school_coordinates_clean.csv')
-# hawker_coord = load_data('Data/hawker_coordinates_clean.csv')
-# shop_coord = load_data('Data/shoppingmall_coordinates_clean.csv')
-# park_coord = load_data('Data/parks_coordinates_clean.csv')
-mrt_coord = load_data('Data/MRT_coordinates.csv')[['STN_NAME','Latitude','Longitude']]
-cpi = pd.read_csv('Data/CPI.csv')
 
 
 ## Get nearest and number of amenities in 2km radius
