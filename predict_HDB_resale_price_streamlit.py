@@ -170,9 +170,9 @@ with st.expander("Expand to see charts"):
     st.pyplot(fig)
 
     # Chart for CPI:
-    cpi_yearly_median = cpi.groupby(cpi['month'].dt.year).median().reset_index().rename(columns={'month':'Year','cpi':'Consumer Price Index'})
-    cpi_yearly_median['Year'] = cpi_yearly_median['Year'].astype('int64')
-    cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
+    # cpi_yearly_median = cpi.groupby(cpi['month'].dt.year).median().reset_index().rename(columns={'month':'Year','cpi':'Consumer Price Index'})
+    # cpi_yearly_median['Year'] = cpi_yearly_median['Year'].astype('int64')
+    # cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
     # fig, ax = plt.subplots(figsize=(7,7))
     # ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
     # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
