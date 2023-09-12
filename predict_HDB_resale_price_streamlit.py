@@ -230,7 +230,7 @@ with st.expander("Expand to see explanation"):
     st.markdown("""
                 As you probably have tried, using **'Median Resale Price Charts'** above is not the best way to predict the resale price of a specific HDB. 
                 There are a few reasons why it does not work:
-                - The charts above are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale prices are **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
+                - The charts above are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale price prediction is **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
                 - There are **other important attributes** affecting the resale price of HDB, such as distances to amenities (eg. supermarkets, schools, MRT/LRT stations). 
                   These were not considered above.
                 - The interactions of the HDB attributes to the resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
