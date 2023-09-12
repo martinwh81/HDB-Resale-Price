@@ -12,7 +12,7 @@ import joblib
 
 st.set_page_config(layout="wide")
 
-st.title('Prediction of Singapore HDB Resale Prices using Machine Learning')
+st.title('Prediction of Singapore HDB Resale Prices using Supervised Machine Learning')
 
 st.text(" ")
 st.text(" ")
@@ -94,10 +94,11 @@ def loll_plot(df, x, y, subtitle, xlabel, xlim):
 
 
 
-st.subheader('HDB  Median Resale Price Charts')
+st.subheader('HDB Median Resale Price Charts\n ***(Use these charts for Guess the Price Game)***')
 with st.expander("Expand to see charts"):
     st.markdown("""                
-                 """)
+                **Challenge**: Can you use the charts below to predict a specific HDB resale price? Try it for yourself!
+                """)
     price_game = prices.loc[prices['month'].dt.year>=2017].copy()
     price_game = price_game[['month','town','flat_model','flat_type','floor_area_sqm','storey_range','lease_commence_date','resale_price']]
     price_game.head()
@@ -106,7 +107,7 @@ with st.expander("Expand to see charts"):
     price_median_town = price_game.groupby('town')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_town['resale_price'] = price_median_town['resale_price'] /1000
     price_median_town['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_town)-2) + ['#00ba38']    
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(8,10))
     loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Town (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -116,7 +117,7 @@ with st.expander("Expand to see charts"):
     price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_flat_model['resale_price'] = price_median_flat_model['resale_price'] /1000
     price_median_flat_model['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_model)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(8,8))
     loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Model (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -126,7 +127,7 @@ with st.expander("Expand to see charts"):
     price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_flat_type['resale_price'] = price_median_flat_type['resale_price'] /1000
     price_median_flat_type['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_type)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,7))
+    fig, ax = plt.subplots(figsize=(8,6))
     loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Type (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -138,7 +139,7 @@ with st.expander("Expand to see charts"):
     price_median_floor_area = price_game.groupby('floor_area_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_floor_area['resale_price'] = price_median_floor_area['resale_price']/1000
     price_median_floor_area['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_floor_area)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,8))
+    fig, ax = plt.subplots(figsize=(8,6))
     loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
@@ -149,7 +150,7 @@ with st.expander("Expand to see charts"):
     price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_storey_range['resale_price'] = price_median_storey_range['resale_price'] /1000
     price_median_storey_range['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_storey_range)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(10,8))
     loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
@@ -162,7 +163,7 @@ with st.expander("Expand to see charts"):
     price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_lease_commence_date['resale_price'] = price_median_lease_commence_date['resale_price']/1000
     price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(10,8))
     loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700])
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
@@ -185,57 +186,12 @@ with st.expander("Expand to see charts"):
     ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
     st.pyplot(fig)
 
-st.subheader('Prediction App Info')
-with st.expander("Expand to see details"):
-    st.markdown("""
-                This is a web app to demonstrate machine learning capability to predict current price of HDB Resale Price. 
-                The model is build based on historical HDB Resale Prices data ([Data.gov.sg](https://data.gov.sg/)) from 2012 to 2023. 
-                In addition to the **standard HDB attributes** (Town, Flat Model, Flat Type, Floor Area, Storey, Lease Commencement), important features
-                related to **distance to amenities** (primary schools, supermarkets, and MRT/LRT) and **Consumer Price Index** were also used to improve the accuracy of
-                the model.
-
-                The following graph shows the most important features at predicting HDB resale price:            
-                """)                
-
-    # Plotting the Feature Importance
-    feature = model_rf.feature_names_in_
-    feature_mapping = {'flat_type': 'Flat Type', 'storey':'Storey', 'floor_area_sqm':'Floor Area (sqm)', 
-                    'lease_commence_date':'Lease Commence Year', 'remaining_lease':'Remaining Lease (yrs)', 
-                    'school_dist':'Nearest distance to Primary School', 'num_school_2km':'Num of Schools within 2km', 
-                    'mrt_dist':'Nearest distance to MRT/LRT', 'num_mrt_2km':'Number of MRT within 2km',
-                    'supermarket_dist':'Nearest distance to supermarket', 'num_supermarket_2km':'Number of supermarkets within 2km',
-                    'dist_dhoby':'Distance to Central of Singapore', 'cpi':'Consumer Price Index', 
-                    'region_East':'Region=East', 'region_North':'Region=North',
-                    'region_North East':'Region=North East', 'region_West':'Region=West',
-                    'model_Apartment':'Model=Apartment','model_Maisonette':'Model=Mansionette', 
-                    'model_Model A':'Model=A', 'model_New Generation':'Model=New Generation',
-                    'model_Special':'Model=Special'}
-
-    feature_names = [feature_mapping[key] for key in feature]
-
-
-    # Plot Feature Importance:
-    fig = plt.figure(figsize=(10,10))
-    feat_imp = pd.DataFrame({'Features': feature_names, 'Feature Importance': model_rf.feature_importances_}).sort_values('Feature Importance', ascending=False)
-    sns.barplot(y='Features', x='Feature Importance', data=feat_imp)
-    plt.title('Feature Importance', size=15)
-    st.pyplot(fig)
-
-#################################################################################################################################################
-
-st.subheader('How to Use to Predict HDB Resale Price')
-st.markdown("""
-            - Expand the *left sidebar* (top left corner),
-            - Enter a HDB address / postal code and select the rest of HDB attributes
-            - Click ***Submit to Predict*** button to predict
-            """)
-
 #################################################################################################################################################
 
 st.subheader('What is Machine Learning?')
-with st.expander("Expand to see explanations"):
+with st.expander("Expand to see explanation"):
     st.markdown("""
-                Machine learning is a branch of artificial intelligence (AI) that to enable computers to automatically *recognize patterns*, *make predictions*,
+                **Machine learning** is a branch of artificial intelligence (AI) that to enable computers to automatically *recognize patterns*, *make predictions*,
                 or *make decisions* based on the information they gather and the experiences they accumulate. 
                 It's all about teaching computers to learn and improve tasks by themselves through data-driven insights.
 
@@ -266,6 +222,61 @@ with st.expander("Expand to see explanations"):
                       1. Can be computationally intensive and require a lot of training.
                       1. Learning can be slow, and initial exploration may lead to suboptimal results.    
                 """)     
+
+#################################################################################################################################################    
+
+st.subheader('Machine Learning for HDB Resale Price Prediction')
+with st.expander("Expand to see explanation"):
+    st.markdown("""
+                As you probably have tried, using **'Median Resale Price Charts'** above is not the best way to predict the resale price of a specific HDB. 
+                There are a few reasons why it does not work:
+                - The charts above are univariate in nature, whereas HDB resale prices are **affected by interactions of multiple attributes (multivariate)**.
+                - There are **other important attributes** affecting the resale price of HDB, such as distances to amenities (eg. supermarkets, schools, MRT/LRT stations). 
+                  These were not considered above.
+                - The interactions of the HDB attributes to their resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
+                                
+                This web app has a built-in **supervised machine learning model** capability to predict the current price of HDB Resale Price. 
+                The model is build based on historical HDB Resale Prices data ([Data.gov.sg](https://data.gov.sg/)) from 2012 to 2023. 
+                In addition to the **standard HDB attributes** (Town, Flat Model, Flat Type, Floor Area, Storey, Lease Commencement), important features
+                related to **distance to amenities** (supermarkets,primary schools, and MRT/LRT stations) and **Consumer Price Index** were also used to improve the accuracy of
+                the model.
+
+                The following graph shows the most important features at predicting HDB resale price:            
+                """)                
+
+    # Plotting the Feature Importance
+    feature = model_rf.feature_names_in_
+    feature_mapping = {'flat_type': 'Flat Type', 'storey':'Storey', 'floor_area_sqm':'Floor Area (sqm)', 
+                    'lease_commence_date':'Lease Commence Year', 'remaining_lease':'Remaining Lease (yrs)', 
+                    'school_dist':'Nearest distance to Primary School', 'num_school_2km':'Num of Schools within 2km', 
+                    'mrt_dist':'Nearest distance to MRT/LRT', 'num_mrt_2km':'Number of MRT within 2km',
+                    'supermarket_dist':'Nearest distance to supermarket', 'num_supermarket_2km':'Number of supermarkets within 2km',
+                    'dist_dhoby':'Distance to Central of Singapore', 'cpi':'Consumer Price Index', 
+                    'region_East':'Region=East', 'region_North':'Region=North',
+                    'region_North East':'Region=North East', 'region_West':'Region=West',
+                    'model_Apartment':'Model=Apartment','model_Maisonette':'Model=Mansionette', 
+                    'model_Model A':'Model=A', 'model_New Generation':'Model=New Generation',
+                    'model_Special':'Model=Special'}
+
+    feature_names = [feature_mapping[key] for key in feature]
+
+
+    # Plot Feature Importance:
+    fig = plt.figure(figsize=(6,6))
+    feat_imp = pd.DataFrame({'Features': feature_names, 'Feature Importance': model_rf.feature_importances_}).sort_values('Feature Importance', ascending=False)
+    sns.barplot(y='Features', x='Feature Importance', data=feat_imp)    
+    plt.title('Attribute/Feature Importance', size=14)
+    st.pyplot(fig)
+
+#################################################################################################################################################
+
+st.subheader('How to Use this App to Predict HDB Resale Price')
+st.markdown("""
+            - Expand the *left sidebar* (top left corner),
+            - Enter a HDB address / postal code and select the rest of HDB attributes
+            - Click ***Submit to Predict*** button to predict
+            """)
+
          
 
 #################################################################################################################################################
