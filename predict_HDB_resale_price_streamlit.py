@@ -70,7 +70,8 @@ school_coord = load_data('Data/school_coordinates_clean.csv')
 # park_coord = load_data('Data/parks_coordinates_clean.csv')
 mrt_coord = load_data('Data/MRT_coordinates.csv')[['STN_NAME','Latitude','Longitude']]
 cpi = pd.read_csv('Data/CPI.csv')
-cpi['month'] = pd.to_datetime(cpi['month'],format = '%Y %b')
+cpi['month'] = pd.to_datetime(cpi['month'])
+
 prices =load_data('Data/Data_2017_onwards.csv')
 prices['month'] = pd.to_datetime(prices['month']) # to datetime
 replace_values = {'NEW GENERATION':'New Generation', 'SIMPLIFIED':'Simplified', 'STANDARD':'Standard', 'MODEL A-MAISONETTE':'Maisonette', 'MULTI GENERATION':'Multi Generation', 'IMPROVED-MAISONETTE':'Executive Maisonette', 'Improved-Maisonette':'Executive Maisonette', 'Premium Maisonette':'Executive Maisonette', '2-ROOM':'2-room', 'MODEL A':'Model A', 'MAISONETTE':'Maisonette', 'Model A-Maisonette':'Maisonette', 'IMPROVED':'Improved', 'TERRACE':'Terrace', 'PREMIUM APARTMENT':'Premium Apartment', 'Premium Apartment Loft':'Premium Apartment', 'APARTMENT':'Apartment', 'Type S1':'Type S1S2', 'Type S2':'Type S1S2'}
