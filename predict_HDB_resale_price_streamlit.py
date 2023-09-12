@@ -94,7 +94,7 @@ def loll_plot(df, x, y, subtitle, xlabel, xlim):
 
 
 
-st.subheader('HDB Median Resale Price Charts\n ***(Use these charts for Guess the Price Game)***')
+st.subheader("HDB Median Resale Price Charts\n ***(Use these charts for 'Guess the Price' game)***")
 with st.expander("Expand to see charts"):
     st.markdown("""                
                 **Challenge**: Can you use the charts below to predict a specific HDB resale price? Try it for yourself!
@@ -191,7 +191,7 @@ with st.expander("Expand to see charts"):
 st.subheader('What is Machine Learning?')
 with st.expander("Expand to see explanation"):
     st.markdown("""
-                **Machine learning** is a branch of artificial intelligence (AI) that to enable computers to automatically *recognize patterns*, *make predictions*,
+                **Machine learning** is a branch of artificial intelligence (AI) that  enables computers to automatically *recognize patterns*, *make predictions*,
                 or *make decisions* based on the information they gather and the experiences they accumulate. 
                 It's all about teaching computers to learn and improve tasks by themselves through data-driven insights.
 
@@ -230,10 +230,10 @@ with st.expander("Expand to see explanation"):
     st.markdown("""
                 As you probably have tried, using **'Median Resale Price Charts'** above is not the best way to predict the resale price of a specific HDB. 
                 There are a few reasons why it does not work:
-                - The charts above are univariate in nature, whereas HDB resale prices are **affected by interactions of multiple attributes (multivariate)**.
+                - The charts above are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale prices are **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
                 - There are **other important attributes** affecting the resale price of HDB, such as distances to amenities (eg. supermarkets, schools, MRT/LRT stations). 
                   These were not considered above.
-                - The interactions of the HDB attributes to their resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
+                - The interactions of the HDB attributes to the resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
                                 
                 This web app has a built-in **supervised machine learning model** capability to predict the current price of HDB Resale Price. 
                 The model is build based on historical HDB Resale Prices data ([Data.gov.sg](https://data.gov.sg/)) from 2012 to 2023. 
