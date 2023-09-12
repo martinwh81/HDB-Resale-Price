@@ -235,13 +235,13 @@ with st.expander("Expand to see explanation"):
                   These were not considered above.
                 - The interactions of the HDB attributes to the resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
                                 
-                This web app has a built-in **supervised machine learning model** capability to predict the current price of HDB Resale Price. 
-                The model is build based on historical HDB Resale Prices data ([Data.gov.sg](https://data.gov.sg/)) from 2012 to 2023. 
+                This web app has a built-in **supervised machine learning model** to predict the current price of HDB Resale Price. 
+                The model is developed based on historical HDB Resale Prices data ([Data.gov.sg](https://data.gov.sg/)) from 2012 to 2023. 
                 In addition to the **standard HDB attributes** (Town, Flat Model, Flat Type, Floor Area, Storey, Lease Commencement), important features
-                related to **distance to amenities** (supermarkets,primary schools, and MRT/LRT stations) and **Consumer Price Index** were also used to improve the accuracy of
+                related to **distance to amenities** (Supermarkets, Primary Schools, MRT/LRT Stations) and **Consumer Price Index** were also used to improve the accuracy of
                 the model.
 
-                The following graph shows the most important features at predicting HDB resale price:            
+                The following graph shows the most important attribute/features for predicting HDB resale price:
                 """)                
 
     # Plotting the Feature Importance
