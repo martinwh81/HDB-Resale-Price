@@ -160,7 +160,7 @@ with st.expander("Expand to see charts"):
     # Chart by Lease Commence Date:
     bins = range(1962,2024,4)
     price_game['lease_date_range'] = pd.cut(x=price_game['lease_commence_date'],bins = bins)
-    price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index()
     price_median_lease_commence_date['resale_price'] = price_median_lease_commence_date['resale_price']/1000
     price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
     fig, ax = plt.subplots(figsize=(10,8))
