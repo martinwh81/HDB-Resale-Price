@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from  matplotlib.ticker import FuncFormatter
 from utils_functions import find_postal, find_nearest, dist_from_location, map, map_flats_year, _max_width_
 import streamlit.components.v1 as components
 import datetime
@@ -69,6 +70,7 @@ school_coord = load_data('Data/school_coordinates_clean.csv')
 # park_coord = load_data('Data/parks_coordinates_clean.csv')
 mrt_coord = load_data('Data/MRT_coordinates.csv')[['STN_NAME','Latitude','Longitude']]
 cpi = pd.read_csv('Data/CPI.csv')
+cpi['month'] = pd.to_datetime(cpi['month'],format = '%Y %b')
 prices =load_data('Data/Data_2017_onwards.csv')
 prices['month'] = pd.to_datetime(prices['month']) # to datetime
 replace_values = {'NEW GENERATION':'New Generation', 'SIMPLIFIED':'Simplified', 'STANDARD':'Standard', 'MODEL A-MAISONETTE':'Maisonette', 'MULTI GENERATION':'Multi Generation', 'IMPROVED-MAISONETTE':'Executive Maisonette', 'Improved-Maisonette':'Executive Maisonette', 'Premium Maisonette':'Executive Maisonette', '2-ROOM':'2-room', 'MODEL A':'Model A', 'MAISONETTE':'Maisonette', 'Model A-Maisonette':'Maisonette', 'IMPROVED':'Improved', 'TERRACE':'Terrace', 'PREMIUM APARTMENT':'Premium Apartment', 'Premium Apartment Loft':'Premium Apartment', 'APARTMENT':'Apartment', 'Type S1':'Type S1S2', 'Type S2':'Type S1S2'}
@@ -91,7 +93,7 @@ def loll_plot(df, x, y, subtitle, xlabel, xlim):
 
 
 
-st.subheader('HDB Fact Charts (best viewed in landscape mode)')
+st.subheader('HDB  Median Resale Price Charts')
 with st.expander("Expand to see charts"):
     st.markdown("""                
                  """)
@@ -167,7 +169,22 @@ with st.expander("Expand to see charts"):
     st.pyplot(fig)
 
 
-st.subheader('App Information')
+    cpi_yearly_median = cpi.groupby(cpi['month'].dt.year).median().reset_index().rename(columns={'month':'Year','cpi':'Consumer Price Index'})
+    cpi_yearly_median['Year'] = cpi_yearly_median['Year'].astype('int64')
+    cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(7,7))
+    ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
+
+    for i,val in enumerate(cpi_yearly_median['Consumer Price Index']):
+        plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))
+    plt.grid()
+    ax.set_xlabel('Year',{'fontsize':10})
+    ax.set_ylabel('Consumer Price Index',{'fontsize':10})
+    ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
+    st.pyplot(fig)
+
+st.subheader('Prediction App Info')
 with st.expander("Expand to see details"):
     st.markdown("""
                 This is a web app to demonstrate machine learning capability to predict current price of HDB Resale Price. 
