@@ -11,7 +11,7 @@ import joblib
 
 st.set_page_config(layout="wide")
 
-st.title('Machine Learning Prediction of Singapore HDB Resale Prices')
+st.title('Prediction of Singapore HDB Resale Prices using Machine Learning')
 
 st.text(" ")
 st.text(" ")
