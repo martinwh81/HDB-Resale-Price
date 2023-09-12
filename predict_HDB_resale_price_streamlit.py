@@ -171,19 +171,19 @@ with st.expander("Expand to see charts"):
 
     # Chart for CPI:
     cpi_yearly_median = cpi.groupby(cpi['month'].dt.year)['cpi'].median().reset_index()
-    # cpi_yearly_median = cpi_yearly_median.rename(columns={'month':'Year','cpi':'Consumer Price Index'})
-    # cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
-    # fig, ax = plt.subplots(figsize=(7,7))
-    # ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
-    # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
+    cpi_yearly_median = cpi_yearly_median.rename(columns={'month':'Year','cpi':'Consumer Price Index'})
+    cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(7,7))
+    ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
 
-    # for i,val in enumerate(cpi_yearly_median['Consumer Price Index']):
-    #     plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))
-    # plt.grid()
-    # ax.set_xlabel('Year',{'fontsize':10})
-    # ax.set_ylabel('Consumer Price Index',{'fontsize':10})
-    # ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
-    # st.pyplot(fig)
+    for i,val in enumerate(cpi_yearly_median['Consumer Price Index']):
+        plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))
+    plt.grid()
+    ax.set_xlabel('Year',{'fontsize':10})
+    ax.set_ylabel('Consumer Price Index',{'fontsize':10})
+    ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
+    st.pyplot(fig)
 
 st.subheader('Prediction App Info')
 with st.expander("Expand to see details"):
