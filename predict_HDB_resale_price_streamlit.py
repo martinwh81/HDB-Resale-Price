@@ -170,7 +170,7 @@ with st.expander("Expand to see charts"):
     st.pyplot(fig)
 
     # Chart for CPI:
-    cpi_yearly_median = cpi.groupby(cpi['month'].dt.year).median().reset_index()
+    cpi_yearly_median = cpi.groupby(cpi['month'].dt.year)['cpi'].median().reset_index()
     # cpi_yearly_median = cpi_yearly_median.rename(columns={'month':'Year','cpi':'Consumer Price Index'})
     # cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
     # fig, ax = plt.subplots(figsize=(7,7))
