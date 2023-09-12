@@ -91,7 +91,7 @@ def loll_plot(df, x, y, subtitle, xlabel, xlim):
 
 
 
-st.subheader('HDB Fact Charts')
+st.subheader('HDB Fact Charts (best viewed in landscape mode)')
 with st.expander("Expand to see charts"):
     st.markdown("""                
                  """)
