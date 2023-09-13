@@ -304,6 +304,12 @@ with st.expander("Expand to see explanation"):
                 """)     
 
 #################################################################################################################################################    
+def plot_feature_importance():
+    fig = plt.figure(figsize=(6,6))
+    feat_imp = pd.DataFrame({'Features': feature_names, 'Feature Importance': model_rf.feature_importances_}).sort_values('Feature Importance', ascending=False)
+    sns.barplot(y='Features', x='Feature Importance', data=feat_imp)    
+    plt.title('Attribute/Feature Importance', size=14)
+    return fig
 
 st.subheader('Machine Learning for HDB Resale Price Prediction')
 with st.expander("Expand to see explanation"):
@@ -342,10 +348,7 @@ with st.expander("Expand to see explanation"):
 
 
     # Plot Feature Importance:
-    fig = plt.figure(figsize=(6,6))
-    feat_imp = pd.DataFrame({'Features': feature_names, 'Feature Importance': model_rf.feature_importances_}).sort_values('Feature Importance', ascending=False)
-    sns.barplot(y='Features', x='Feature Importance', data=feat_imp)    
-    plt.title('Attribute/Feature Importance', size=14)
+    fig = plot_feature_importance()
     st.pyplot(fig)
 
 #################################################################################################################################################
