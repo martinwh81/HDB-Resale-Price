@@ -210,7 +210,7 @@ with st.expander("Expand to see charts"):
     # fig, ax = plt.subplots(figsize=(8,6))
     fig, ax = loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300],figsize=(8,6))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Floor Area (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
     
