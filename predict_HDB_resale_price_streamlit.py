@@ -8,6 +8,7 @@ from utils_functions import find_postal, find_nearest, dist_from_location, map, 
 import streamlit.components.v1 as components
 import datetime
 import joblib
+import gc
 
 
 st.set_page_config(layout="wide")
@@ -165,6 +166,7 @@ with st.expander("Expand to see charts"):
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Town (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart by Flat Model:
     price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
@@ -175,6 +177,7 @@ with st.expander("Expand to see charts"):
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Model (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart by Flat Type:
     price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
@@ -185,6 +188,7 @@ with st.expander("Expand to see charts"):
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Type (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart by Floor Area:
     bins = range(20,270,20)
@@ -198,6 +202,7 @@ with st.expander("Expand to see charts"):
     ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Floor Area (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart by Storey:
     price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
@@ -209,6 +214,7 @@ with st.expander("Expand to see charts"):
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Storey Range (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart by Lease Commence Date:
     bins = range(1962,2024,4)
@@ -222,6 +228,7 @@ with st.expander("Expand to see charts"):
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Lease Commence Date (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
+    
 
     # Chart for CPI:
     cpi_yearly_median = cpi.groupby(cpi['month'].dt.year)['cpi'].median().reset_index()
@@ -238,7 +245,14 @@ with st.expander("Expand to see charts"):
     ax.set_ylabel('Consumer Price Index',{'fontsize':10})
     ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
     st.pyplot(fig)
-
+    
+    
+    del(prices,price_median_town,price_median_flat_model,price_median_flat_type,
+        price_median_floor_area,price_median_storey_range,price_median_lease_commence_date,
+        cpi_yearly_median)
+    gc.collect()
+    
+    
 #################################################################################################################################################
 
 st.subheader('What is Machine Learning?')
