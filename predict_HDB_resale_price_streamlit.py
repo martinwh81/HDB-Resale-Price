@@ -134,7 +134,7 @@ prices = prices.replace({'flat_model': replace_values})
 
 #################################################################################################################################################
 # Function for lollipop charts
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 def loll_plot(df, x, y, subtitle, xlabel, xlim, figsize):
     fig, ax = plt.subplots(figsize=figsize)
     plt.rc('axes', axisbelow=True)
