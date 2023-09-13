@@ -19,7 +19,11 @@ st.image('Comm_image_small.png')
 #     text_title= f'<center><p style="font-family:Arial;color:Blue; font-size: 24px;"><strong>Machine Learning for HDB Resale Price Prediction</strong></p>'
 #     st.markdown(text_title,unsafe_allow_html=True)
 # with col2:
-st.image('Guess_the_price_image.png')
+# st.image('Guess_the_price_image.png')
+
+
+text_title= f'<center><p style="font-family:Arial;color:Blue; font-size: 28px;"><strong>Machine Learning for HDB Resale Price Prediction<br>(Guess the Price Game)</strong></p>'
+st.markdown(text_title,unsafe_allow_html=True)
 
 # st.title('Guess the Price')
 # st.title('Prediction of Singapore HDB Resale Prices using Supervised Machine Learning')
