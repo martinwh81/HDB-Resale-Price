@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 from  matplotlib.ticker import FuncFormatter
@@ -133,7 +134,9 @@ prices = prices.replace({'flat_model': replace_values})
 
 #################################################################################################################################################
 # Function for lollipop charts
-def loll_plot(df, x, y, subtitle, xlabel, xlim):
+@st.cache(allow_output_mutation=True)
+def loll_plot(df, x, y, subtitle, xlabel, xlim, figsize):
+    fig, ax = plt.subplots(figsize=figsize)
     plt.rc('axes', axisbelow=True)
     plt.grid(linestyle='--', alpha=0.4)
     plt.hlines(y=df.index, xmin=0, xmax=df[x], color=df.color, linewidth=1)
@@ -145,8 +148,16 @@ def loll_plot(df, x, y, subtitle, xlabel, xlim):
                     ha='right', va='bottom')
     plt.yticks(df.index, df[y]); plt.xticks(fontsize=12); plt.xlim(xlim)
     plt.xlabel(xlabel, fontsize=14)
+    return fig, ax
 
 
+# @st.cache(hash_funcs={matplotlib.figure.Figure: lambda _: None})
+@st.cache(allow_output_mutation=True)
+def lineplot(df, x, y, marker, markersize, figsize):
+    fig, ax = plt.subplots(figsize=figsize)
+    ax = sns.lineplot(df,x=x,y=y,marker=marker,markersize=markersize)
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
+    return fig, ax
 
 st.subheader("HDB Median Resale Price Charts\n ***(Use the following charts to manually predict HDB Resale Price in 'Guess the Price' game)***")
 with st.expander("Expand to see charts"):
@@ -161,8 +172,8 @@ with st.expander("Expand to see charts"):
     price_median_town = price_game.groupby('town')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_town['resale_price'] = price_median_town['resale_price'] /1000
     price_median_town['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_town)-2) + ['#00ba38']    
-    fig, ax = plt.subplots(figsize=(8,10))
-    loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800])
+    # fig, ax = plt.subplots(figsize=(8,10))
+    fig, ax =loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800],figsize=(8,10))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Town (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
@@ -172,8 +183,8 @@ with st.expander("Expand to see charts"):
     price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_flat_model['resale_price'] = price_median_flat_model['resale_price'] /1000
     price_median_flat_model['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_model)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(8,8))
-    loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100])
+    # fig, ax = plt.subplots(figsize=(8,8))
+    fig, ax = loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100],figsize = (8,8))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Model (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
@@ -183,8 +194,8 @@ with st.expander("Expand to see charts"):
     price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_flat_type['resale_price'] = price_median_flat_type['resale_price'] /1000
     price_median_flat_type['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_type)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(8,6))
-    loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900])
+    # fig, ax = plt.subplots(figsize=(8,6))
+    fig, ax = loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900], figsize=(8,6))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Type (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
@@ -196,8 +207,8 @@ with st.expander("Expand to see charts"):
     price_median_floor_area = price_game.groupby('floor_area_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_floor_area['resale_price'] = price_median_floor_area['resale_price']/1000
     price_median_floor_area['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_floor_area)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(8,6))
-    loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300])
+    # fig, ax = plt.subplots(figsize=(8,6))
+    fig, ax = loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300],figsize=(8,6))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Floor Area (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -208,8 +219,8 @@ with st.expander("Expand to see charts"):
     price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
     price_median_storey_range['resale_price'] = price_median_storey_range['resale_price'] /1000
     price_median_storey_range['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_storey_range)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,8))
-    loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200])
+    # fig, ax = plt.subplots(figsize=(10,8))
+    fig, ax = loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200],figsize=(10,8))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Storey Range (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -222,8 +233,8 @@ with st.expander("Expand to see charts"):
     price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index()
     price_median_lease_commence_date['resale_price'] = price_median_lease_commence_date['resale_price']/1000
     price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
-    fig, ax = plt.subplots(figsize=(10,8))
-    loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700])
+    # fig, ax = plt.subplots(figsize=(10,8))
+    fig, ax = loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700],figsize=(10,8))
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Lease Commence Date (HDB sales data from 2017 - 2023)',{'fontsize':18})
@@ -234,10 +245,12 @@ with st.expander("Expand to see charts"):
     cpi_yearly_median = cpi.groupby(cpi['month'].dt.year)['cpi'].median().reset_index()
     cpi_yearly_median = cpi_yearly_median.rename(columns={'month':'Year','cpi':'Consumer Price Index'})
     cpi_yearly_median = cpi_yearly_median.loc[cpi_yearly_median['Year']>=2017].reset_index(drop=True)
-    fig, ax = plt.subplots(figsize=(7,7))
-    ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
+    # fig, ax = plt.subplots(figsize=(7,7))
+    # ax = sns.lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10)
+    # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))    
+    # ax = lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker='o',markersize=10, figsize=(7,7))
 
+    fig, ax = lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker ='o',markersize=10, figsize=(7,7))   
     for i,val in enumerate(cpi_yearly_median['Consumer Price Index']):
         plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))
     plt.grid()
