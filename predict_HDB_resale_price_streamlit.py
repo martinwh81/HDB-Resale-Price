@@ -303,6 +303,10 @@ with st.expander("Expand to see explanation"):
                       1. Learning can be slow, and initial exploration may lead to suboptimal results.    
                 """)     
 
+
+
+
+
 #################################################################################################################################################    
 def plot_feature_importance():
     fig = plt.figure(figsize=(6,6))
@@ -315,7 +319,7 @@ st.subheader('Machine Learning for HDB Resale Price Prediction')
 with st.expander("Expand to see explanation"):
     st.markdown("""
                 As you probably have tried, using **'Median Resale Price Charts'** above is not the best way to predict the resale price of a specific HDB. 
-                There are a few reasons why it does not work:
+                There are a few reasons why it may not work well:
                 - The charts above are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale price prediction is **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
                 - There are **other important attributes** affecting the resale price of HDB, such as distances to amenities (eg. supermarkets, schools, MRT/LRT stations). 
                   These were not considered above.
@@ -345,11 +349,15 @@ with st.expander("Expand to see explanation"):
                     'model_Special':'Model=Special'}
 
     feature_names = [feature_mapping[key] for key in feature]
-
-
     # Plot Feature Importance:
     fig = plot_feature_importance()
     st.pyplot(fig)
+    st.text(" ")
+    st.text(" ")
+    st.markdown("""
+                **🤔 Now, can you try to predict the HDB Resale Price using Machine Learning and compare with your own manual prediction?**
+                """)
+
 
 #################################################################################################################################################
 
@@ -488,6 +496,22 @@ flat1_predict = model_rf.predict(flat1)
 
 st.text(" ")
 
+###############################################################################################################################
+
+df_input = pd.DataFrame({'Flat Address':[flat_address],
+                         'Town': [town],
+                         'Flat Model': [flat_model],
+                         'Flat Type':[flat_type],
+                         'Floor Area': [floor_area],
+                         'Storey': [storey],
+                         'Lease Commencement Date': [lease_commence_date]
+                         },index = ['Attribute Value'])
+
+# textinput = f'<p style="font-family:Arial;color:Blue; font-size: 28px;">You have selected the following HDB attribute:</p>'
+# st.markdown(textinput, unsafe_allow_html=True)
+st.subheader('You have selected the following HDB attribute')
+st.dataframe(df_input)
+
 ## EXPANDER FOR AMENITIES INFORMATION
 st.subheader('Amenities Within 2km Radius')
 with st.expander("MRT/LRT Station"):
@@ -496,10 +520,13 @@ with st.expander("Primary School"):
     st.subheader('Nearest Primary School: **%s** (%0.2fkm)' % (flat_coord.iloc[0]['school'], flat_coord.iloc[0]['school_dist']))    
 with st.expander("Supermarket/Shop"):
     st.subheader('Nearest Supermarket/Shop: **%s** (%0.2fkm)' % (flat_coord.iloc[0]['supermarket'], flat_coord.iloc[0]['supermarket_dist']))
-      
-st.markdown("#")
+
+
+
 
 # st.header(f'The Predicted HDB Resale Price is SG${flat1_predict[0]:,.0f}')
 textresult = f'<p style="font-family:Arial;color:Blue; font-size: 28px;">The Predicted HDB Resale Price is <strong>SG${flat1_predict[0]:,.0f}</strong></p>'
 st.markdown(textresult,unsafe_allow_html=True)
 
+
+###############################################################################################################################
