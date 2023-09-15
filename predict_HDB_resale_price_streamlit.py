@@ -88,6 +88,14 @@ with tab1:
         ax = sns.lineplot(df,x=x,y=y,marker=marker,markersize=markersize)
         ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
         return fig, ax
+    
+    @st.cache(allow_output_mutation=True)
+    def load_model():
+        model_rf = joblib.load('rf_compressed.pkl')
+        return model_rf
+
+    model_rf = load_model()
+            
 
     st.subheader("HDB Median Resale Price Charts\n ***(Use the following charts to manually predict HDB Resale Price in 'Guess the Price' game)***")
     
@@ -201,86 +209,10 @@ with tab2:
     disp_header_image()
     text_title= f'<center><p style="font-family:Arial;color:Blue; font-size: 28px;"><strong>Guess the Price - Machine Learning Prediction of HDB Resale Price</strong></p>'
     st.markdown(text_title,unsafe_allow_html=True)
-    options_question =  [f'Q{str(i)}' for i in range(1,21)]
-
-    questions= [['457 ANG MO KIO AVE 10','ANG MO KIO','Adjoined flat','EXECUTIVE',176,15,1980],
-                ['25 SIN MING RD','BISHAN','Improved','4 ROOM',88,5,1974],
-                ['546A SEGAR RD','BUKIT PANJANG','Improved','5 ROOM',112,14,2015],
-                ['445 TAMPINES ST 42','TAMPINES','Simplified','3 ROOM',64,2,1986],
-                ['28 MARINE CRES','MARINE PARADE','Standard','5 ROOM',123,11,1975],
-                ['527 JURONG WEST ST 52','JURONG WEST','New Generation','3 ROOM',67,11,1983],
-                ['21 CHAI CHEE RD','BEDOK','Improved','3 ROOM',65,5,1972],
-                ['659C PUNGGOL EAST','PUNGGOL','Model A','2 ROOM',47,2,2018],
-                ['804A KEAT HONG CL','CHOA CHU KANG','Model A','4 ROOM',93,14,2017],
-                ['33 GHIM MOH LINK','QUEENSTOWN','Model A','3 ROOM',68,35,2018],
-                ['881 WOODLANDS ST 82','WOODLANDS','Improved','5 ROOM',123,11,1996],
-                ['296A BT BATOK ST 22','BUKIT BATOK','Premium Apartment','5 ROOM',115,26,2018],
-                ['1B CANTONMENT RD','CENTRAL AREA','Type S1S2','4 ROOM',93,20,2011],
-                ['102 PASIR RIS ST 12','PASIR RIS','Model A','4 ROOM',104,11,1988],
-                ['7 TOH YI DR','BUKIT TIMAH','Apartment','EXECUTIVE',142,5,1989],
-                ['440C CLEMENTI AVE 3','CLEMENTI','Improved','5 ROOM',112,14,2018],
-                ['302 SERANGOON AVE 2','SERANGOON','Improved','3 ROOM',69,8,1985],
-                ['365C SEMBAWANG CRES','SEMBAWANG','Model A','4 ROOM',93,11,2019],
-                ['717 CLEMENTI WEST ST 2','CLEMENTI','Improved','5 ROOM',118,23,1981],
-                ['172 LOR 1 TOA PAYOH','TOA PAYOH','Improved','5 ROOM',124,20,1995]]
 
 
 
-    options_town = sorted(list(['ANG MO KIO', 'BEDOK', 'BISHAN', 'BUKIT BATOK', 'BUKIT MERAH',
-                    'BUKIT TIMAH', 'CENTRAL AREA', 'CHOA CHU KANG', 'CLEMENTI',
-                    'GEYLANG', 'HOUGANG', 'JURONG EAST', 'JURONG WEST',
-                    'KALLANG/WHAMPOA', 'MARINE PARADE', 'QUEENSTOWN', 'SENGKANG',
-                    'SERANGOON', 'TAMPINES', 'TOA PAYOH', 'WOODLANDS', 'YISHUN',
-                    'LIM CHU KANG', 'SEMBAWANG', 'BUKIT PANJANG', 'PASIR RIS','PUNGGOL']))
-    options_flat_model = sorted(list(['Model A', 'Improved', 'Premium Apartment', 'Standard',
-                                                    'New Generation', 'Maisonette', 'Apartment', 'Simplified',
-                                                    'Model A2', 'DBSS', 'Terrace', 'Adjoined flat', 'Multi Generation',
-                                                    '2-room', 'Executive Maisonette', 'Type S1S2']))
-    options_flat_type = list(['2 ROOM', '3 ROOM', '4 ROOM', '5 ROOM', 'EXECUTIVE'])
-    options_storey = list(range(1, 52))
-    options_lease_commence_date = list(reversed(range(1966, 2022)))
 
-
-    with st.sidebar:
-        question_selected = st.selectbox('Select Question Number', options_question, index=0)           
-        question_index = int(question_selected[1:])-1
-
-        selected_flat_address = questions[question_index][0]
-        selected_town_index = options_town.index(questions[question_index][1])
-        selected_flat_model_index = options_flat_model.index(questions[question_index][2])
-        selected_flat_type_index = options_flat_type.index(questions[question_index][3])
-        selected_floor_area = questions[question_index][4]
-        selected_storey = options_storey.index(questions[question_index][5])
-        selected_lease_commence_date = options_lease_commence_date.index(questions[question_index][6])
-        # print(selected_flat_address,selected_town_index,selected_flat_model_index,selected_flat_type_index,selected_floor_area,selected_storey,selected_lease_commence_date)
-            
-    with st.sidebar.form('User Input HDB Features'):
-        flat_address = st.text_input("Flat Address or Postal Code", selected_flat_address) # flat address    
-        town = st.selectbox('Town', options_town, index=selected_town_index)
-        flat_model = st.selectbox('Flat Model', options_flat_model, index=selected_flat_model_index)
-        flat_type = st.selectbox('Flat Type', options_flat_type, index=selected_flat_type_index)
-        floor_area = st.slider("Floor Area (sqm)", 34,280,selected_floor_area) # floor area
-        # storey = st.selectbox('Storey', list(['01 TO 03','04 TO 06','07 TO 09','10 TO 12','13 TO 15',
-        #                                             '16 TO 18','19 TO 21','22 TO 24','25 TO 27','28 TO 30',
-        #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
-        #                                             '46 TO 48','49 TO 51']), index=3)
-        # storey = st.slider('Storey', 1,51,7)
-        storey = st.selectbox('Storey', options_storey,selected_storey)
-        
-        lease_commence_date = st.selectbox('Lease Commencement Date', options_lease_commence_date, index=selected_lease_commence_date)
-        
-        submitted1 = st.form_submit_button(label = 'Submit to Predict')
-
-
-    @st.cache(allow_output_mutation=True)
-    def load_model():
-        model_rf = joblib.load('rf_compressed.pkl')
-        return model_rf
-
-    model_rf = load_model()
-
-
-        
         
     #################################################################################################################################################
 
@@ -382,18 +314,87 @@ with tab2:
 
     #################################################################################################################################################
 
-    st.subheader('How to Use this App to Predict HDB Resale Price')
-    st.markdown("""
-                There are two options:
-                1. To select the question number (ie. Q1-Q20) from **'Guess the Price'** game:        
-                    - Expand the *left sidebar* (top left corner)
-                    - Select the question number and the rest of HDB attributes will be prefilled and HDB Resale Price will be predicted                
-                2. To manually fill in the desired HDB attributes:
-                    - Expand the *left sidebar* (top left corner)
-                    - Enter a HDB address / postal code and select the rest of HDB attributes
-                    - Click ***Submit to Predict*** button to predict            
-                """)
+    options_question =  [f'Q{str(i)}' for i in range(1,21)]
+    questions= [['457 ANG MO KIO AVE 10','ANG MO KIO','Adjoined flat','EXECUTIVE',176,15,1980],
+                ['25 SIN MING RD','BISHAN','Improved','4 ROOM',88,5,1974],
+                ['546A SEGAR RD','BUKIT PANJANG','Improved','5 ROOM',112,14,2015],
+                ['445 TAMPINES ST 42','TAMPINES','Simplified','3 ROOM',64,2,1986],
+                ['28 MARINE CRES','MARINE PARADE','Standard','5 ROOM',123,11,1975],
+                ['527 JURONG WEST ST 52','JURONG WEST','New Generation','3 ROOM',67,11,1983],
+                ['21 CHAI CHEE RD','BEDOK','Improved','3 ROOM',65,5,1972],
+                ['659C PUNGGOL EAST','PUNGGOL','Model A','2 ROOM',47,2,2018],
+                ['804A KEAT HONG CL','CHOA CHU KANG','Model A','4 ROOM',93,14,2017],
+                ['33 GHIM MOH LINK','QUEENSTOWN','Model A','3 ROOM',68,35,2018],
+                ['881 WOODLANDS ST 82','WOODLANDS','Improved','5 ROOM',123,11,1996],
+                ['296A BT BATOK ST 22','BUKIT BATOK','Premium Apartment','5 ROOM',115,26,2018],
+                ['1B CANTONMENT RD','CENTRAL AREA','Type S1S2','4 ROOM',93,20,2011],
+                ['102 PASIR RIS ST 12','PASIR RIS','Model A','4 ROOM',104,11,1988],
+                ['7 TOH YI DR','BUKIT TIMAH','Apartment','EXECUTIVE',142,5,1989],
+                ['440C CLEMENTI AVE 3','CLEMENTI','Improved','5 ROOM',112,14,2018],
+                ['302 SERANGOON AVE 2','SERANGOON','Improved','3 ROOM',69,8,1985],
+                ['365C SEMBAWANG CRES','SEMBAWANG','Model A','4 ROOM',93,11,2019],
+                ['717 CLEMENTI WEST ST 2','CLEMENTI','Improved','5 ROOM',118,23,1981],
+                ['172 LOR 1 TOA PAYOH','TOA PAYOH','Improved','5 ROOM',124,20,1995]]
 
+
+
+    options_town = sorted(list(['ANG MO KIO', 'BEDOK', 'BISHAN', 'BUKIT BATOK', 'BUKIT MERAH',
+                    'BUKIT TIMAH', 'CENTRAL AREA', 'CHOA CHU KANG', 'CLEMENTI',
+                    'GEYLANG', 'HOUGANG', 'JURONG EAST', 'JURONG WEST',
+                    'KALLANG/WHAMPOA', 'MARINE PARADE', 'QUEENSTOWN', 'SENGKANG',
+                    'SERANGOON', 'TAMPINES', 'TOA PAYOH', 'WOODLANDS', 'YISHUN',
+                    'LIM CHU KANG', 'SEMBAWANG', 'BUKIT PANJANG', 'PASIR RIS','PUNGGOL']))
+    options_flat_model = sorted(list(['Model A', 'Improved', 'Premium Apartment', 'Standard',
+                                                    'New Generation', 'Maisonette', 'Apartment', 'Simplified',
+                                                    'Model A2', 'DBSS', 'Terrace', 'Adjoined flat', 'Multi Generation',
+                                                    '2-room', 'Executive Maisonette', 'Type S1S2']))
+    options_flat_type = list(['2 ROOM', '3 ROOM', '4 ROOM', '5 ROOM', 'EXECUTIVE'])
+    options_storey = list(range(1, 52))
+    options_lease_commence_date = list(reversed(range(1966, 2022)))
+
+
+    st.subheader('How to Use this App to Predict HDB Resale Price (2 options)')
+    st.markdown("""                
+                1. **By selecting the question number (ie. Q1-Q20) from *'Guess the Price'* game below**
+                """)
+    # with st.sidebar:
+    question_selected = st.selectbox('Question Number', options_question, index=0)           
+    question_index = int(question_selected[1:])-1
+
+    selected_flat_address = questions[question_index][0]
+    selected_town_index = options_town.index(questions[question_index][1])
+    selected_flat_model_index = options_flat_model.index(questions[question_index][2])
+    selected_flat_type_index = options_flat_type.index(questions[question_index][3])
+    selected_floor_area = questions[question_index][4]
+    selected_storey = options_storey.index(questions[question_index][5])
+    selected_lease_commence_date = options_lease_commence_date.index(questions[question_index][6])
+    # print(selected_flat_address,selected_town_index,selected_flat_model_index,selected_flat_type_index,selected_floor_area,selected_storey,selected_lease_commence_date)
+    
+    st.markdown("""
+                2. **By manually filling in the desired HDB attributes below and click *'Submit to Predict'***                
+                """)    
+    
+
+    col1, col2 = st.columns(2)        
+    # with st.sidebar.form('User Input HDB Features'):
+    with st.form('User Input HDB Features'):
+        with col1:    
+            flat_address = st.text_input("Flat Address or Postal Code", selected_flat_address) # flat address    
+            town = st.selectbox('Town', options_town, index=selected_town_index) 
+            flat_model = st.selectbox('Flat Model', options_flat_model, index=selected_flat_model_index)            
+            flat_type = st.selectbox('Flat Type', options_flat_type, index=selected_flat_type_index)        
+        with col2:   
+            
+            floor_area = st.slider("Floor Area (sqm)", 34,280,selected_floor_area) # floor area
+            # storey = st.selectbox('Storey', list(['01 TO 03','04 TO 06','07 TO 09','10 TO 12','13 TO 15',
+            #                                             '16 TO 18','19 TO 21','22 TO 24','25 TO 27','28 TO 30',
+            #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
+            #                                             '46 TO 48','49 TO 51']), index=3)
+            # storey = st.slider('Storey', 1,51,7)
+            storey = st.selectbox('Storey', options_storey,selected_storey)
+            
+            lease_commence_date = st.selectbox('Lease Commencement Date', options_lease_commence_date, index=selected_lease_commence_date)        
+        submitted1 = st.form_submit_button(label = 'Submit to Predict')
 
     #################################################################################################################################################
 
