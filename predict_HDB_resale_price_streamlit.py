@@ -355,7 +355,7 @@ with tab2:
 
     st.subheader('How to Use this App to Predict HDB Resale Price (2 options)')
     st.markdown("""                
-                1. **By selecting the question number (ie. Q1-Q20) from *'Guess the Price'* game below**
+                1. **By selecting the *question number (ie. Q1-Q20) from 'Guess the Price'* game**
                 """)
     # with st.sidebar:
     question_selected = st.selectbox('Question Number', options_question, index=0)           
@@ -375,9 +375,9 @@ with tab2:
                 """)    
     
 
-    col1, col2 = st.columns(2)        
-    # with st.sidebar.form('User Input HDB Features'):
     with st.form('User Input HDB Features'):
+        col1, col2 = st.columns(2)        
+    # with st.sidebar.form('User Input HDB Features'):    
         with col1:    
             flat_address = st.text_input("Flat Address or Postal Code", selected_flat_address) # flat address    
             town = st.selectbox('Town', options_town, index=selected_town_index) 
@@ -391,10 +391,9 @@ with tab2:
             #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
             #                                             '46 TO 48','49 TO 51']), index=3)
             # storey = st.slider('Storey', 1,51,7)
-            storey = st.selectbox('Storey', options_storey,selected_storey)
-            
+            storey = st.selectbox('Storey', options_storey,selected_storey)            
             lease_commence_date = st.selectbox('Lease Commencement Date', options_lease_commence_date, index=selected_lease_commence_date)        
-        submitted1 = st.form_submit_button(label = 'Submit to Predict')
+            submitted1 = st.form_submit_button(label = 'Submit to Predict')
 
     #################################################################################################################################################
 
@@ -548,7 +547,7 @@ with tab2:
     textresult = f'<p style="font-family:Arial;color:Blue; font-size: 28px;">The Predicted HDB Resale Price is <strong>SG${flat1_predict[0]:,.0f}</strong></p>'
     st.markdown(textresult,unsafe_allow_html=True)
 
-    textdisclaimer = f'<p style="font-family:Arial;color:Red; font-size: 12px;"><em>(Disclaimer: This app is purely for educational purpose only. Please do not use the prediction for buying/selling decision.)</em></p>'
+    textdisclaimer = f'<p style="font-family:Arial;color:Red; font-size: 14px;"><em>(Disclaimer: This app is purely for educational purpose only. Please do not use the prediction for buying/selling decision.)</em></p>'
     st.markdown(textdisclaimer,unsafe_allow_html=True)
 
 
