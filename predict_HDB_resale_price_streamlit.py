@@ -108,12 +108,13 @@ with tab1:
                 path_effects.Normal(),
             ])
 
-    # @st.cache(hash_funcs={matplotlib.figure.Figure: lambda _: None})
+
     @st.cache(allow_output_mutation=True)
     def lineplot(df, x, y, marker, markersize, figsize):
         fig, ax = plt.subplots(figsize=figsize)
         ax = sns.lineplot(df,x=x,y=y,marker=marker,markersize=markersize)
         ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: int(x)))
+        ax.grid(True)        
         return fig, ax
     
     @st.cache(allow_output_mutation=True)
@@ -229,8 +230,7 @@ with tab1:
 
     fig, ax = lineplot(cpi_yearly_median,x='Year',y='Consumer Price Index',marker ='o',markersize=10, figsize=(7,7))   
     for i,val in enumerate(cpi_yearly_median['Consumer Price Index']):
-        plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))
-    plt.grid()
+        plt.annotate(f'{val:.1f}',(cpi_yearly_median.iloc[i,0]-0.2,cpi_yearly_median.iloc[i,1]+0.2))    
     ax.set_xlabel('Year',{'fontsize':10})
     ax.set_ylabel('Consumer Price Index',{'fontsize':10})
     ax.set_title('Consumer Price Index (Housing and Utilities)',{'fontsize':12})    
