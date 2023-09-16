@@ -87,7 +87,8 @@ with tab1:
         fig, ax = plt.subplots(figsize=figsize)
         ax = sns.boxplot(data=df,x=x,y=y,order=df_median.index,showfliers = False)
         add_median_labels(ax)
-        plt.xticks(fontsize=12);         
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)         
         plt.xlabel(xlabel, fontsize=14)
         plt.ylabel(ylabel, fontsize=14)
         return fig, ax
