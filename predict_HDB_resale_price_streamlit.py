@@ -86,6 +86,7 @@ with tab1:
     def box_plot(df,df_median, x, y, xlabel,ylabel,figsize):
         fig, ax = plt.subplots(figsize=figsize)
         ax = sns.boxplot(data=df,x=x,y=y,order=df_median.index,showfliers = False)
+        ax.grid(True)
         add_median_labels(ax)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)         
