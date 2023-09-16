@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as path_effects
 import seaborn as sns
 from  matplotlib.ticker import FuncFormatter
 from utils_functions import find_postal, find_nearest, dist_from_location, map, map_flats_year, _max_width_
@@ -63,6 +64,7 @@ with tab1:
     prices = prices.replace({'flat_model': replace_values})
 
     #################################################################################################################################################
+    sns.set()
     # Function for lollipop charts
     @st.cache(allow_output_mutation=True)
     def loll_plot(df, x, y, subtitle, xlabel, xlim, figsize):
@@ -80,6 +82,31 @@ with tab1:
         plt.xlabel(xlabel, fontsize=14)
         return fig, ax
 
+    @st.cache(allow_output_mutation=True)
+    def box_plot(df,df_median, x, y, xlabel,ylabel,figsize):
+        fig, ax = plt.subplots(figsize=figsize)
+        ax = sns.boxplot(data=df,x=x,y=y,order=df_median.index,showfliers = False)
+        add_median_labels(ax)
+        plt.xticks(fontsize=12);         
+        plt.xlabel(xlabel, fontsize=14)
+        plt.ylabel(ylabel, fontsize=14)
+        return fig, ax
+
+    def add_median_labels(ax, fmt='.0f'):
+        lines = ax.get_lines()
+        boxes = [c for c in ax.get_children() if type(c).__name__ == 'PathPatch']
+        lines_per_box = int(len(lines) / len(boxes))
+        for median in lines[4:len(lines):lines_per_box]:
+            x, y = (data.mean() for data in median.get_data())
+            # choose value depending on horizontal or vertical plot orientation
+            value = x if (median.get_xdata()[1] - median.get_xdata()[0]) == 0 else y
+            text = ax.text(x, y, f'{value:{fmt}}', ha='center', va='center',
+                        fontweight='bold', color='white')
+            # create median-colored border around white text for contrast
+            text.set_path_effects([
+                path_effects.Stroke(linewidth=3, foreground=median.get_color()),
+                path_effects.Normal(),
+            ])
 
     # @st.cache(hash_funcs={matplotlib.figure.Figure: lambda _: None})
     @st.cache(allow_output_mutation=True)
@@ -97,84 +124,96 @@ with tab1:
     model_rf = load_model()
             
 
-    st.subheader("HDB Median Resale Price Charts\n ***(Use the following charts to manually predict HDB Resale Price in 'Guess the Price' game)***")
+    st.subheader("HDB Median Resale Price Charts (Box Plots)\n ***(Use the following charts to manually predict HDB Resale Price in 'Guess the Price' game)***")
     
     st.markdown("""                
                 **Challenge**: Can you use the charts below to predict a specific HDB resale price? Try it for yourself!
                 """)
     price_game = prices.loc[prices['month'].dt.year>=2017].copy()
     price_game = price_game[['month','town','flat_model','flat_type','floor_area_sqm','storey_range','lease_commence_date','resale_price']]
+    price_game['resale_price'] = price_game['resale_price'] / 1000
     price_game.head()
 
-    # Chart by Town:
-    price_median_town = price_game.groupby('town')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
-    price_median_town['resale_price'] = price_median_town['resale_price'] /1000
-    price_median_town['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_town)-2) + ['#00ba38']    
-    # fig, ax = plt.subplots(figsize=(8,10))
-    fig, ax =loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800],figsize=(8,10))
+    ## Chart by Town:
+    # price_median_town = price_game.groupby('town')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)    
+    # price_median_town['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_town)-2) + ['#00ba38']    
+    # fig, ax =loll_plot(price_median_town,'resale_price','town','','Resale Price (SGD)',[50, 800],figsize=(8,10))    
+    
+    grouped = price_game.loc[:,['town', 'resale_price']].groupby(['town']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','town','Resale Price (SGD)','Town',figsize=(8,10))
+
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    ax.set_title('Median Resale Price by Town (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    ax.set_title('Median Resale Price by Town (Sales data from 2017-2023)',{'fontsize':18})
     st.pyplot(fig)
     
 
-    # Chart by Flat Model:
-    price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
-    price_median_flat_model['resale_price'] = price_median_flat_model['resale_price'] /1000
-    price_median_flat_model['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_model)-2) + ['#00ba38']
-    # fig, ax = plt.subplots(figsize=(8,8))
-    fig, ax = loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100],figsize = (8,8))
+    ## Chart by Flat Model:
+    # price_median_flat_model = price_game.groupby('flat_model')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)    
+    # price_median_flat_model['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_model)-2) + ['#00ba38']
+    # fig, ax = loll_plot(price_median_flat_model,'resale_price','flat_model','','Resale Price (SGD)',[200, 1100],figsize = (8,8))
+
+    grouped = price_game.loc[:,['flat_model', 'resale_price']].groupby(['flat_model']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','flat_model','Resale Price (SGD)','Flat Model',figsize=(8,8))
+
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    ax.set_title('Median Resale Price by Flat Model (HDB sales data from 2017 - 2023)',{'fontsize':18})
+    ax.set_title('Median Resale Price by Flat Model (Sales data from 2017-2023)',{'fontsize':18})
     st.pyplot(fig)
     
 
     # Chart by Flat Type:
-    price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
-    price_median_flat_type['resale_price'] = price_median_flat_type['resale_price'] /1000
-    price_median_flat_type['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_type)-2) + ['#00ba38']
-    # fig, ax = plt.subplots(figsize=(8,6))
-    fig, ax = loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900], figsize=(8,6))
+    # price_median_flat_type = price_game.groupby('flat_type')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    # price_median_flat_type['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_flat_type)-2) + ['#00ba38']
+    # fig, ax = loll_plot(price_median_flat_type,'resale_price','flat_type','','Resale Price (SGD)',[100, 900], figsize=(8,6))
+
+    grouped = price_game.loc[:,['flat_type', 'resale_price']].groupby(['flat_type']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','flat_type','Resale Price (SGD)','Flat Type',figsize=(8,6))
+
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
     ax.set_title('Median Resale Price by Flat Type (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
     
 
-    # Chart by Floor Area:
+    ## Chart by Floor Area:
     bins = range(20,270,20)
     price_game['floor_area_range'] = pd.cut(x=price_game['floor_area_sqm'],bins = bins)
-    price_median_floor_area = price_game.groupby('floor_area_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
-    price_median_floor_area['resale_price'] = price_median_floor_area['resale_price']/1000
-    price_median_floor_area['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_floor_area)-2) + ['#00ba38']
-    # fig, ax = plt.subplots(figsize=(8,6))
-    fig, ax = loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300],figsize=(8,6))
-    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    # price_median_floor_area = price_game.groupby('floor_area_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
+    # price_median_floor_area['resale_price'] = price_median_floor_area['resale_price']
+    # price_median_floor_area['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_floor_area)-2) + ['#00ba38']        
+    # fig, ax = loll_plot(price_median_floor_area,'resale_price','floor_area_range','','Resale Price (SGD)',[100, 1300],figsize=(8,6))
+    
+    grouped = price_game.loc[:,['floor_area_range', 'resale_price']].groupby(['floor_area_range']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','floor_area_range','Resale Price (SGD)','Flor Area (sqm)',figsize=(8,6))
+
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())    
     ax.set_title('Median Resale Price by Floor Area (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
     
 
-    # Chart by Storey:
-    price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)
-    price_median_storey_range['resale_price'] = price_median_storey_range['resale_price'] /1000
-    price_median_storey_range['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_storey_range)-2) + ['#00ba38']
-    # fig, ax = plt.subplots(figsize=(10,8))
-    fig, ax = loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200],figsize=(10,8))
-    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
+    ## Chart by Storey:
+    # price_median_storey_range = price_game.groupby('storey_range')['resale_price'].median().reset_index().sort_values(by='resale_price',ascending=True).reset_index(drop=True)    
+    # price_median_storey_range['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_storey_range)-2) + ['#00ba38']    
+    # fig, ax = loll_plot(price_median_storey_range,'resale_price','storey_range','','Resale Price (SGD)',[200, 1200],figsize=(10,8))
+
+    grouped = price_game.loc[:,['storey_range', 'resale_price']].groupby(['storey_range']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','storey_range','Resale Price (SGD)','Storey',figsize=(10,8))
+
+    ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())    
     ax.set_title('Median Resale Price by Storey Range (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
     
 
-    # Chart by Lease Commence Date:
+    ## Chart by Lease Commence Date:
     bins = range(1962,2024,4)
     price_game['lease_date_range'] = pd.cut(x=price_game['lease_commence_date'],bins = bins)
-    price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index()
-    price_median_lease_commence_date['resale_price'] = price_median_lease_commence_date['resale_price']/1000
-    price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
-    # fig, ax = plt.subplots(figsize=(10,8))
-    fig, ax = loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700],figsize=(10,8))
+
+    # price_median_lease_commence_date = price_game.groupby('lease_date_range')['resale_price'].median().reset_index()
+    # price_median_lease_commence_date['color'] = ['#f8766d'] + ['#3c78d8']*(len(price_median_lease_commence_date)-2) + ['#00ba38']
+    # fig, ax = loll_plot(price_median_lease_commence_date,'resale_price','lease_date_range','','Resale Price (SGD)',[100, 700],figsize=(10,8))
+
+    grouped = price_game.loc[:,['lease_date_range', 'resale_price']].groupby(['lease_date_range']).median().sort_values(by='resale_price',ascending = False)
+    fig, ax = box_plot(price_game, grouped,'resale_price','lease_date_range','Resale Price (SGD)','Lease Commencement Date',figsize=(10,8))
+
     ax.set_xticklabels(f'{x:,.0f}K' for x in ax.get_xticks())
-    # ax.set_yticklabels(f'{y.get_text()} sqm' for y in ax.get_yticklabels())
     ax.set_title('Median Resale Price by Lease Commence Date (HDB sales data from 2017 - 2023)',{'fontsize':18})
     st.pyplot(fig)
     
@@ -198,9 +237,11 @@ with tab1:
     st.pyplot(fig)
     
     
-    del(prices,price_median_town,price_median_flat_model,price_median_flat_type,
-        price_median_floor_area,price_median_storey_range,price_median_lease_commence_date,
-        cpi_yearly_median)
+    # del(prices,price_median_town,price_median_flat_model,price_median_flat_type,
+    #     price_median_floor_area,price_median_storey_range,price_median_lease_commence_date,
+    #     cpi_yearly_median)
+    del(prices,grouped, cpi_yearly_median)
+
     gc.collect()
 
 #################################################################################################################################################
@@ -266,10 +307,10 @@ with tab2:
     st.subheader('Machine Learning for HDB Resale Price Prediction')
     with st.expander("Expand to see explanation"):
         st.markdown("""
-                    As you probably have tried, using **'Median Resale Price Charts'** is not the best way to predict the resale price of a specific HDB. 
+                    As you probably have tried, using **Median Resale Price per HDB attribute** is not the best way to predict the resale price of a specific HDB. 
                     There are a few reasons why it may not work well:
-                    - The charts above are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale price prediction is **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
-                    - Predicting **specific** HDB price using aggregated data (median) will not be accurate as the **aggregated data has lost information on spread**.
+                    - The charts are univariate in nature (ie. considering only 1 attribute at a time), whereas HDB resale price prediction is **multivariate in nature (affected by interactions of multiple attributes simultaneously**.
+                    - Predicting a **specific HDB price** using aggregated data (median) will not be accurate as the **aggregated data has lost information on local effect of the feature**.
                     - There are **other important attributes** affecting the resale price of HDB, such as distances to amenities (eg. supermarkets, schools, MRT/LRT stations). These were not considered above.
                     - The interactions of the HDB attributes to the resale price are **complex and nonlinear** in nature, so simple averaging/median will not work well.
                                     
@@ -549,6 +590,7 @@ with tab2:
 
     textdisclaimer = f'<p style="font-family:Arial;color:Red; font-size: 14px;"><em>(Disclaimer: This app is purely for educational purpose only. Please do not use the prediction for buying/selling decision.)</em></p>'
     st.markdown(textdisclaimer,unsafe_allow_html=True)
+
 
 
 ###############################################################################################################################
