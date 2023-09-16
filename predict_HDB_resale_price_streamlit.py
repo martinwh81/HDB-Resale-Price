@@ -417,26 +417,26 @@ with tab2:
                 2. **By manually filling in the desired HDB attributes below and click *'Submit to Predict'***                
                 """)    
     
-
-    with st.form('User Input HDB Features'):
-        col1, col2 = st.columns(2)        
-    # with st.sidebar.form('User Input HDB Features'):    
-        with col1:    
-            flat_address = st.text_input("Flat Address or Postal Code", selected_flat_address) # flat address    
-            town = st.selectbox('Town', options_town, index=selected_town_index) 
-            flat_model = st.selectbox('Flat Model', options_flat_model, index=selected_flat_model_index)            
-            flat_type = st.selectbox('Flat Type', options_flat_type, index=selected_flat_type_index)        
-        with col2:   
-            
-            floor_area = st.slider("Floor Area (sqm)", 34,280,selected_floor_area) # floor area
-            # storey = st.selectbox('Storey', list(['01 TO 03','04 TO 06','07 TO 09','10 TO 12','13 TO 15',
-            #                                             '16 TO 18','19 TO 21','22 TO 24','25 TO 27','28 TO 30',
-            #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
-            #                                             '46 TO 48','49 TO 51']), index=3)
-            # storey = st.slider('Storey', 1,51,7)
-            storey = st.selectbox('Storey', options_storey,selected_storey)            
-            lease_commence_date = st.selectbox('Lease Commencement Date', options_lease_commence_date, index=selected_lease_commence_date)        
-            submitted1 = st.form_submit_button(label = 'Submit to Predict')
+    with st.expander("Expand to select HDB attributes"):
+        with st.form('User Input HDB Features'):
+            col1, col2 = st.columns(2)        
+        # with st.sidebar.form('User Input HDB Features'):    
+            with col1:    
+                flat_address = st.text_input("Flat Address or Postal Code", selected_flat_address) # flat address    
+                town = st.selectbox('Town', options_town, index=selected_town_index) 
+                flat_model = st.selectbox('Flat Model', options_flat_model, index=selected_flat_model_index)            
+                flat_type = st.selectbox('Flat Type', options_flat_type, index=selected_flat_type_index)        
+            with col2:   
+                
+                floor_area = st.slider("Floor Area (sqm)", 34,280,selected_floor_area) # floor area
+                # storey = st.selectbox('Storey', list(['01 TO 03','04 TO 06','07 TO 09','10 TO 12','13 TO 15',
+                #                                             '16 TO 18','19 TO 21','22 TO 24','25 TO 27','28 TO 30',
+                #                                             '31 TO 33','34 TO 36','37 TO 39','40 TO 42','43 TO 45',
+                #                                             '46 TO 48','49 TO 51']), index=3)
+                # storey = st.slider('Storey', 1,51,7)
+                storey = st.selectbox('Storey', options_storey,selected_storey)            
+                lease_commence_date = st.selectbox('Lease Commencement Date', options_lease_commence_date, index=selected_lease_commence_date)        
+                submitted1 = st.form_submit_button(label = 'Submit to Predict')
 
     #################################################################################################################################################
 
