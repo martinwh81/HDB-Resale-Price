@@ -45,7 +45,7 @@ with tab1:
     st.text(" ")
 
 
-    @st.cache_data
+    @st.cache(allow_output_mutation=True)
     def load_data(filepath):
         return pd.read_csv(filepath)
 
@@ -66,7 +66,7 @@ with tab1:
     #################################################################################################################################################
     sns.set()
     # Function for lollipop charts
-    @st.cache_data
+    @st.cache(allow_output_mutation=True)
     def loll_plot(df, x, y, subtitle, xlabel, xlim, figsize):
         fig, ax = plt.subplots(figsize=figsize)
         plt.rc('axes', axisbelow=True)
@@ -82,7 +82,7 @@ with tab1:
         plt.xlabel(xlabel, fontsize=14)
         return fig, ax
 
-    @st.cache_data
+    @st.cache(allow_output_mutation=True)
     def box_plot(df,df_median, x, y, xlabel,ylabel,figsize):
         fig, ax = plt.subplots(figsize=figsize)
         ax = sns.boxplot(data=df,x=x,y=y,order=df_median.index,showfliers = False)
@@ -111,7 +111,7 @@ with tab1:
             ])
 
 
-    @st.cache_resource
+    @st.cache(allow_output_mutation=True)
     def lineplot(df, x, y, marker, markersize, figsize):
         fig, ax = plt.subplots(figsize=figsize)
         ax = sns.lineplot(df,x=x,y=y,marker=marker,markersize=markersize)
@@ -119,7 +119,7 @@ with tab1:
         ax.grid(True)        
         return fig, ax
     
-    @st.cache_resource
+    @st.cache(allow_output_mutation=True)
     def load_model():
         model_rf = joblib.load('rf_compressed.pkl')
         return model_rf
